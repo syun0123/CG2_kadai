@@ -6,6 +6,8 @@
 #include<dxgi1_6.h>
 #include<cassert>
 #include<dxgidebug.h>
+#include <array>
+
 
 #include<dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
@@ -17,6 +19,7 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
+#include "main.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
@@ -64,8 +67,153 @@ struct Vector4
 };
 
 
+
 ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInByTe);
 
+//std::array<std::array<float, 4>, 4> MakeAffineMatrix(const Vector3& col1, const Vector3& col2, const Vector3& col3, const Vector3& translation) {
+//	std::array<std::array<float, 4>, 4> matrix = { {
+//		{col1.x, col2.x, col3.x, translation.x},
+//		{col1.y, col2.y, col3.y, translation.y},
+//		{col1.z, col2.z, col3.z, translation.z},
+//		{0.0f,  0.0f,  0.0f,  1.0f}
+//	} };
+//	return matrix;
+//}
+Matrix4x4 MakeAffineMatrix(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 result;
+
+	result.m[0][0] =
+		m1.m[0][0] * m2.m[0][0] + 
+		m1.m[0][1] * m2.m[1][0] +
+		m1.m[0][2] * m2.m[2][0] +
+		m1.m[0][3] * m2.m[3][0];
+	result.m[0][1] =
+		m1.m[0][0] * m2.m[0][1] +
+		m1.m[0][1] * m2.m[1][1] + 
+		m1.m[0][2] * m2.m[2][1] +
+		m1.m[0][3] * m2.m[3][1];
+	result.m[0][2] =
+		m1.m[0][0] * m2.m[0][2] +
+		m1.m[0][1] * m2.m[1][2] +
+		m1.m[0][2] * m2.m[2][2] +
+		m1.m[0][3] * m2.m[3][2];
+	result.m[0][3] =
+		m1.m[0][0] * m2.m[0][3] +
+		m1.m[0][1] * m2.m[1][3] +
+		m1.m[0][2] * m2.m[2][3] +
+		m1.m[0][3] * m2.m[3][3];
+
+	result.m[1][0] =
+		m1.m[1][0] * m2.m[0][0] + 
+		m1.m[1][1] * m2.m[1][0] + 
+		m1.m[1][2] * m2.m[2][0] +
+		m1.m[1][3] * m2.m[3][0];
+	result.m[1][1] =
+		m1.m[1][0] * m2.m[0][1] + 
+		m1.m[1][1] * m2.m[1][1] + 
+		m1.m[1][2] * m2.m[2][1] + 
+		m1.m[1][3] * m2.m[3][1];
+	result.m[1][2] =
+		m1.m[1][0] * m2.m[0][2] +
+		m1.m[1][1] * m2.m[1][2] + 
+		m1.m[1][2] * m2.m[2][2] +
+		m1.m[1][3] * m2.m[3][2];
+	result.m[1][3] =
+		m1.m[1][0] * m2.m[0][3] +
+		m1.m[1][1] * m2.m[1][3] + 
+		m1.m[1][2] * m2.m[2][3] +
+		m1.m[1][3] * m2.m[3][3];
+	result.m[2][0] =
+		m1.m[2][0] * m2.m[0][0] +
+		m1.m[2][1] * m2.m[1][0] +
+		m1.m[2][2] * m2.m[2][0] +
+		m1.m[2][3] * m2.m[3][0];
+	result.m[2][1] =
+		m1.m[2][0] * m2.m[0][1] +
+		m1.m[2][1] * m2.m[1][1] +
+		m1.m[2][2] * m2.m[2][1] +
+		m1.m[2][3] * m2.m[3][1];
+	result.m[2][2] =
+		m1.m[2][0] * m2.m[0][2] +
+		m1.m[2][1] * m2.m[1][2] +
+		m1.m[2][2] * m2.m[2][2] +
+		m1.m[2][3] * m2.m[3][2];
+	result.m[2][3] =
+		m1.m[2][0] * m2.m[0][3] +
+		m1.m[2][1] * m2.m[1][3] +
+		m1.m[2][2] * m2.m[2][3] +
+		m1.m[2][3] * m2.m[3][3];
+
+	result.m[3][0] =
+		m1.m[3][0] * m2.m[0][0] +
+		m1.m[3][1] * m2.m[1][0] +
+		m1.m[3][2] * m2.m[2][0] +
+		m1.m[3][3] * m2.m[3][0];
+	result.m[3][1] =
+		m1.m[3][0] * m2.m[0][1] +
+		m1.m[3][1] * m2.m[1][1] + 
+		m1.m[3][2] * m2.m[2][1] + 
+		m1.m[3][3] * m2.m[3][1];
+	result.m[3][2] =
+		m1.m[3][0] * m2.m[0][2] +
+		m1.m[3][1] * m2.m[1][2] +
+		m1.m[3][2] * m2.m[2][2] +
+		m1.m[3][3] * m2.m[3][2];
+	result.m[3][3] =
+		m1.m[3][0] * m2.m[0][3] +
+		m1.m[3][1] * m2.m[1][3] +
+		m1.m[3][2] * m2.m[2][3] +
+		m1.m[3][3] * m2.m[3][3];
+
+	return result;
+}
+
+
+
+
+struct Matrix4x4 {
+	float m[4][4];
+
+	Matrix4x4() {
+		for (int i = 0; i < 4; ++i) {
+			for (int j = 0; j < 4; ++j) {
+				m[i][j] = 0.0f;
+			}
+		}
+	}
+};
+Matrix4x4 MakeIdentity4x4()
+{
+	Matrix4x4 identityMatrix;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			if (i == j) {
+				identityMatrix.m[i][j] = 1.0f;  // 対角成分は1
+			}
+			else{
+				identityMatrix.m[i][j] = 0.0f;  // それ以外は0
+			}
+		}
+	}
+
+	return identityMatrix;
+}
+struct Vector3
+{
+	float x;
+	float y;
+	float z;
+};
+
+struct Transform {
+	Vector3 scale;
+	Vector3 rotate;
+	Vector3 translate;
+};
+Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 //ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg,
 	WPARAM wparam, LPARAM lparam) {
@@ -220,8 +368,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ID3D12DescriptorHeap* CreateDescriptorHeap(
 	ID3D12Device * device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
-
 	
+
+	// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
+	ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
+	// データを書き込む
+	Matrix4x4* wvpData = nullptr;
+	// 書き込むためのアドレスを取得
+	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+	// 単位行列を書きこんでおく
+	*wvpData = MakeIdentity4x4();
+
+	Matrix4x4 cameraMatrix = MakeAffineMatrix();
+	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix();
+
+	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+
+
+
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+
+
 
 	D3D_FEATURE_LEVEL featureLevels[] = {
 		D3D_FEATURE_LEVEL_12_2, D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0
@@ -238,12 +406,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags =
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 	// Root Parameter作成。複数設定できるので配列。今回は結果」つだけなので長さ1の配列
-	D3D12_ROOT_PARAMETER rootParameters[1] = {};// CBVを使う 
+	D3D12_ROOT_PARAMETER rootParameters[2] = {};// CBVを使う 
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // Pixel Shaderで使う
-	rootParameters[0].Descriptor.ShaderRegister = 0; // レジスタ番号とバインド 
+	rootParameters[0].Descriptor.ShaderRegister = 0; // レジスタ番号とバインド
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[1].Descriptor.ShaderRegister = 0;
+
 	descriptionRootSignature.pParameters = rootParameters; // ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters); //配列の長さ
 
@@ -272,7 +445,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
 	assert(SUCCEEDED(hr));
 
-
+	
 
 
 	//BlendStateの設定
@@ -548,6 +721,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		else {
 			//ゲームの処理
+			transform.rotate.y += 0.03f;
+			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.rotate, transform.translate, transform.translate);
+				* wvpData = worldMatrix;
 			//ここから書き込むバックバッファのインデックスを取得
 			ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();
@@ -595,6 +771,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//描画!(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
 			commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 			commandList->DrawInstanced(3, 1, 0, 0);
+			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 			
 			//画面に描く処理は終わり
