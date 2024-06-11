@@ -9,6 +9,8 @@
 #include <array>
 
 
+
+
 #include<dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 #pragma comment(lib,"dxguid.lib")
@@ -171,6 +173,10 @@ Matrix4x4 MakeAffineMatrix(const Matrix4x4& m1, const Matrix4x4& m2) {
 
 
 
+ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInByTe);
+
+
+
 struct Matrix4x4 {
 	float m[4][4];
 
@@ -190,17 +196,25 @@ Matrix4x4 MakeIdentity4x4()
 	{
 		for (int j = 0; j < 4; ++j)
 		{
+
 			if (i == j) {
 				identityMatrix.m[i][j] = 1.0f;  // 対角成分は1
 			}
 			else{
 				identityMatrix.m[i][j] = 0.0f;  // それ以外は0
 			}
+
+			if (i == j)
+				identityMatrix.m[i][j] = 1.0f;  // 対角成分は1
+			else
+				identityMatrix.m[i][j] = 0.0f;  // それ以外は0
+
 		}
 	}
 
 	return identityMatrix;
 }
+
 struct Vector3
 {
 	float x;
@@ -214,6 +228,9 @@ struct Transform {
 	Vector3 translate;
 };
 Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
+
+
 //ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg,
 	WPARAM wparam, LPARAM lparam) {
@@ -368,6 +385,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ID3D12DescriptorHeap* CreateDescriptorHeap(
 	ID3D12Device * device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
+
 	
 
 	// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
@@ -388,6 +406,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+
+
+	
+
+	// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
+	ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
+	// データを書き込む
+	Matrix4x4* wvpData = nullptr;
+	// 書き込むためのアドレスを取得
+	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+	// 単位行列を書きこんでおく
+	*wvpData = MakeIdentity4x4();
+
+	
+
 
 
 
