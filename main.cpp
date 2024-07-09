@@ -8,6 +8,11 @@
 #include<dxgidebug.h>
 #include <array>
 
+#include "MakeAffineMatrix.h"
+
+
+
+
 
 
 
@@ -22,6 +27,9 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 #include "main.h"
+#include "externals/DirectXTex/DirectXTex.h"
+#include "externals/DirectXTex/DirectXTex.h"
+//#include "TextureLoader.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
@@ -70,6 +78,8 @@ struct Vector4
 
 
 
+
+
 ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInByTe);
 
 //std::array<std::array<float, 4>, 4> MakeAffineMatrix(const Vector3& col1, const Vector3& col2, const Vector3& col3, const Vector3& translation) {
@@ -84,88 +94,14 @@ ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInByTe);
 Matrix4x4 MakeAffineMatrix(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 result;
 
-	result.m[0][0] =
-		m1.m[0][0] * m2.m[0][0] + 
-		m1.m[0][1] * m2.m[1][0] +
-		m1.m[0][2] * m2.m[2][0] +
-		m1.m[0][3] * m2.m[3][0];
-	result.m[0][1] =
-		m1.m[0][0] * m2.m[0][1] +
-		m1.m[0][1] * m2.m[1][1] + 
-		m1.m[0][2] * m2.m[2][1] +
-		m1.m[0][3] * m2.m[3][1];
-	result.m[0][2] =
-		m1.m[0][0] * m2.m[0][2] +
-		m1.m[0][1] * m2.m[1][2] +
-		m1.m[0][2] * m2.m[2][2] +
-		m1.m[0][3] * m2.m[3][2];
-	result.m[0][3] =
-		m1.m[0][0] * m2.m[0][3] +
-		m1.m[0][1] * m2.m[1][3] +
-		m1.m[0][2] * m2.m[2][3] +
-		m1.m[0][3] * m2.m[3][3];
-
-	result.m[1][0] =
-		m1.m[1][0] * m2.m[0][0] + 
-		m1.m[1][1] * m2.m[1][0] + 
-		m1.m[1][2] * m2.m[2][0] +
-		m1.m[1][3] * m2.m[3][0];
-	result.m[1][1] =
-		m1.m[1][0] * m2.m[0][1] + 
-		m1.m[1][1] * m2.m[1][1] + 
-		m1.m[1][2] * m2.m[2][1] + 
-		m1.m[1][3] * m2.m[3][1];
-	result.m[1][2] =
-		m1.m[1][0] * m2.m[0][2] +
-		m1.m[1][1] * m2.m[1][2] + 
-		m1.m[1][2] * m2.m[2][2] +
-		m1.m[1][3] * m2.m[3][2];
-	result.m[1][3] =
-		m1.m[1][0] * m2.m[0][3] +
-		m1.m[1][1] * m2.m[1][3] + 
-		m1.m[1][2] * m2.m[2][3] +
-		m1.m[1][3] * m2.m[3][3];
-	result.m[2][0] =
-		m1.m[2][0] * m2.m[0][0] +
-		m1.m[2][1] * m2.m[1][0] +
-		m1.m[2][2] * m2.m[2][0] +
-		m1.m[2][3] * m2.m[3][0];
-	result.m[2][1] =
-		m1.m[2][0] * m2.m[0][1] +
-		m1.m[2][1] * m2.m[1][1] +
-		m1.m[2][2] * m2.m[2][1] +
-		m1.m[2][3] * m2.m[3][1];
-	result.m[2][2] =
-		m1.m[2][0] * m2.m[0][2] +
-		m1.m[2][1] * m2.m[1][2] +
-		m1.m[2][2] * m2.m[2][2] +
-		m1.m[2][3] * m2.m[3][2];
-	result.m[2][3] =
-		m1.m[2][0] * m2.m[0][3] +
-		m1.m[2][1] * m2.m[1][3] +
-		m1.m[2][2] * m2.m[2][3] +
-		m1.m[2][3] * m2.m[3][3];
-
-	result.m[3][0] =
-		m1.m[3][0] * m2.m[0][0] +
-		m1.m[3][1] * m2.m[1][0] +
-		m1.m[3][2] * m2.m[2][0] +
-		m1.m[3][3] * m2.m[3][0];
-	result.m[3][1] =
-		m1.m[3][0] * m2.m[0][1] +
-		m1.m[3][1] * m2.m[1][1] + 
-		m1.m[3][2] * m2.m[2][1] + 
-		m1.m[3][3] * m2.m[3][1];
-	result.m[3][2] =
-		m1.m[3][0] * m2.m[0][2] +
-		m1.m[3][1] * m2.m[1][2] +
-		m1.m[3][2] * m2.m[2][2] +
-		m1.m[3][3] * m2.m[3][2];
-	result.m[3][3] =
-		m1.m[3][0] * m2.m[0][3] +
-		m1.m[3][1] * m2.m[1][3] +
-		m1.m[3][2] * m2.m[2][3] +
-		m1.m[3][3] * m2.m[3][3];
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			result.m[i][j] = 0;
+			for (int k = 0; k < 4; k++) {
+				result.m[i][j] += m1.m[i][k] * m2.m[k][j];
+			}
+		}
+	}
 
 	return result;
 }
@@ -175,6 +111,9 @@ Matrix4x4 MakeAffineMatrix(const Matrix4x4& m1, const Matrix4x4& m2) {
 
 ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInByTe);
 
+
+
+ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInByTe);
 
 
 struct Matrix4x4 {
@@ -188,32 +127,7 @@ struct Matrix4x4 {
 		}
 	}
 };
-Matrix4x4 MakeIdentity4x4()
-{
-	Matrix4x4 identityMatrix;
 
-	for (int i = 0; i < 4; ++i)
-	{
-		for (int j = 0; j < 4; ++j)
-		{
-
-			if (i == j) {
-				identityMatrix.m[i][j] = 1.0f;  // 対角成分は1
-			}
-			else{
-				identityMatrix.m[i][j] = 0.0f;  // それ以外は0
-			}
-
-			if (i == j)
-				identityMatrix.m[i][j] = 1.0f;  // 対角成分は1
-			else
-				identityMatrix.m[i][j] = 0.0f;  // それ以外は0
-
-		}
-	}
-
-	return identityMatrix;
-}
 
 struct Vector3
 {
@@ -221,11 +135,19 @@ struct Vector3
 	float y;
 	float z;
 };
-
+struct Vector2
+{
+	float x;
+	float y;
+};
 struct Transform {
 	Vector3 scale;
 	Vector3 rotate;
 	Vector3 translate;
+};
+struct VertexData {
+	Vector4 position;
+	Vector2 texcoord;
 };
 Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
@@ -311,7 +233,7 @@ IDxcBlob* CompileShader(
 
 // windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-
+	CoInitializeEx(0, COINIT_MULTITHREADED);
 	WNDCLASS wc{};
 	//ウィンドウプロシージャ
 	wc.lpfnWndProc = WindowProc;
@@ -385,7 +307,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ID3D12DescriptorHeap* CreateDescriptorHeap(
 	ID3D12Device * device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
-
 	
 
 	// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
@@ -397,17 +318,44 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 単位行列を書きこんでおく
 	*wvpData = MakeIdentity4x4();
 
-	Matrix4x4 cameraMatrix = MakeAffineMatrix();
-	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix();
+	
 
+	// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
+	ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
+	// データを書き込む
+	Matrix4x4* wvpData = nullptr;
+	// 書き込むためのアドレスを取得
+	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+	// 単位行列を書きこんでおく
+	*wvpData = MakeIdentity4x4();
+    Matrix4x4 cameraMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+    Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+    Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
+
+    Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+
+    Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+
+    Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+	
+	Matrix4x4 projectionMatrix = MakePerspectiveFovmatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
+
+    
+	
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	*transformationMatrixData = worldViewProjectionMatrix;
+    Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	
+	
 
+	
 
+	
 
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-
-
+	
+	
+	
+	
 	
 
 	// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
@@ -420,6 +368,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	*wvpData = MakeIdentity4x4();
 
 	
+
 
 
 
@@ -498,6 +447,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	assert(device != nullptr);
 	Log("Complete create D3D12Device!!!\n");
+
+
+	// Textureを読んで転送する
+	DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	ID3D12Resource* textureResource = CreateTextureResource(device, metadata);
+	UploadTextureData(textureResource, mipImages);
 
 
 
@@ -589,14 +545,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 頂点リソースにデータを書き込む
 	Vector4* vertexData = nullptr;
 	// 書き込むためのアドレスを取得
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexResource->Map(0, nullptr, 
+		reinterpret_cast<void**>(&vertexData));
 	//左下
-	vertexData[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+	vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
+	vertexData[0].texcoord = { -0.5f, -0.5f, 0.0f, 1.0f };
 	//上
-	vertexData[1] = { 0.0f, 0.5f, 0.0f, 1.0f };
+	vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
+	vertexData[1].texcoord = { 0.0f, 0.5f, 0.0f, 1.0f };
 	// 右下
-	vertexData[2] = { 0.5f, -0.5f, 0.0f, 1.0f };
-
+	vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
+	vertexData[2].texcoord = { 0.5f, -0.5f, 0.0f, 1.0f };
 	//ピューポート
 	D3D12_VIEWPORT viewport{};
 	// クライアント領域のサイズと一緒にして画面全体に表示
@@ -691,6 +650,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//ディスクリプタヒープが作れなかったので起動できない
 	assert(SUCCEEDED(hr));
 
+	// metaDataを基にSRVの設定
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D; //2Dテクスチャ
+	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+	// SRVを作成する DescriptorHeapの場所を決める
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU= srvDescriptorHeap->GetGPUDescriptorHandle ForHeapStart();
+	// 先頭はImGuiが使っているのでその次を使う
+	textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	// SRVの生成
+	device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
+
+
+
 
 
 	
@@ -755,7 +731,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		else {
 			//ゲームの処理
 			transform.rotate.y += 0.03f;
-			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.rotate, transform.translate, transform.translate);
+			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 				* wvpData = worldMatrix;
 			//ここから書き込むバックバッファのインデックスを取得
 			ImGui_ImplDX12_NewFrame();
@@ -842,6 +818,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			assert(SUCCEEDED(hr));
 			hr = commandList->Reset(commandAllocator, nullptr);
 			assert(SUCCEEDED(hr));
+
+			CoUninitialize();
+
 		}
 	}
 
@@ -897,6 +876,9 @@ ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTO
 		return descriptorHeap;
 	}
 }
+
+
+
 
 
 ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizelnBytes) {
