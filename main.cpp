@@ -10,12 +10,6 @@
 
 #include "MakeAffineMatrix.h"
 
-
-
-
-
-
-
 #include<dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 #pragma comment(lib,"dxguid.lib")
@@ -26,7 +20,6 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
-#include "main.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/DirectXTex.h"
 //#include "TextureLoader.h"
@@ -329,7 +322,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 単位行列を書きこんでおく
 	*wvpData = MakeIdentity4x4();
     Matrix4x4 cameraMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-    Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+    Matrix4x4 viewMatrix = Invers(cameraMatrix);
     Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
 
     Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -338,7 +331,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
 	
-	Matrix4x4 projectionMatrix = MakePerspectiveFovmatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
 
     
 	
@@ -348,15 +341,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 	
 
-	
-
-	
-
-	
-	
-	
-	
-	
 
 	// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
 	ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
