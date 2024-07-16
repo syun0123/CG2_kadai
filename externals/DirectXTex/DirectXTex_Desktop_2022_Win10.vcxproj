@@ -440,6 +440,7 @@
     <ClCompile Include="CreateTextureResource.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="TextureResource.cpp" />
+    <ClCompile Include="UploadTextureData.cpp" />
     <CLInclude Include="BC.h" />
     <ClCompile Include="BC.cpp" />
     <ClCompile Include="BC4BC5.cpp" />
@@ -483,6 +484,7 @@
     <ClCompile Include="DirectXTexWIC.cpp" />
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="TextureResource.h" />
+    <ClInclude Include="UploadTextureData.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompileShaders.cmd" />

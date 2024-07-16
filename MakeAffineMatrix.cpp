@@ -6,11 +6,7 @@
 #include<cmath>
 #define _USE_MATH_DEFINES
 
-//struct Vector3 final {
-//	float x;
-//	float y;
-//	float z;
-//};
+
 
 
 Matrix4x4 MakeIdentity4x4() {

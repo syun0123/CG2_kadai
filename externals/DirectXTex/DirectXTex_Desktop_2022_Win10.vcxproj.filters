@@ -48,6 +48,9 @@
     <ClInclude Include="TextureResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UploadTextureData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BC.cpp">
@@ -113,6 +116,7 @@
     <ClCompile Include="TextureResource.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="CreateTextureResource.cpp" />
+    <ClCompile Include="UploadTextureData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="BC.h">
